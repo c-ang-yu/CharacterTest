@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F5F5F5">
+<title>测测你是哈白里的谁</title>
+<link rel="icon" href="data:,">
+<style>
+/* =========================================================
+ * 测测你是哈白里的谁 · 单文件静态页
+ * 规范沿用 BravoPlay：#F5F5F5 页面底 + 白色圆角卡片；黑白主色；
+ * 中文宋体；胶囊 border-radius:999；430px 手机版式。
+ * ========================================================= */
+:root{
+  --ink:#111111; --page:#F5F5F5; --card:#ffffff; --line:#e7e7e5;
+  --gray:#9a9a96; --faint:#c4c4c0;
+  --font:Arial,"Helvetica Neue","SourceHanSerif","Songti SC","SimSun","NSimSun",serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
+body{background:#e8e8e6;font-family:var(--font);color:var(--ink);}
+button{font-family:var(--font);border:none;background:none;color:inherit;cursor:pointer;}
+.hidden{display:none !important;}
+
+.app{max-width:430px;margin:0 auto;min-height:100vh;min-height:100dvh;background:var(--page);position:relative;box-shadow:0 0 40px rgba(0,0,0,.08);}
+.view{display:none;min-height:100vh;min-height:100dvh;position:relative;padding-bottom:60px;}
+.view.active{display:block;animation:fadein .28s ease;}
+@keyframes fadein{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+/* ---------- 头区 ---------- */
+.hero{height:33.3vh;height:33.3dvh;min-height:210px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:44px;}
+.hero.small{height:auto;min-height:0;padding:44px 20px 8px;}
+.logo{font-size:32px;font-weight:700;letter-spacing:2px;}
+.logo-sub{margin-top:9px;font-size:10px;color:var(--gray);letter-spacing:6px;}
+.cap{text-align:center;font-size:11px;color:var(--gray);letter-spacing:4px;}
+.r-name{font-size:40px;font-weight:700;letter-spacing:6px;margin-top:10px;}
+.r-chip{margin-top:12px;display:inline-flex;align-items:center;justify-content:center;height:26px;padding:0 14px;border:1.2px solid var(--ink);border-radius:999px;font-size:12.5px;letter-spacing:2px;background:#fff;}
+
+.pad{padding:0 20px;}
+.card{background:var(--card);border-radius:20px;padding:18px 16px;box-shadow:0 2px 12px rgba(0,0,0,.05);margin-top:12px;}
+.sec-label{font-size:11px;color:var(--gray);letter-spacing:3px;margin:20px 0 10px;display:flex;align-items:center;gap:10px;}
+.sec-label::after{content:"";flex:1;height:1px;background:var(--line);}
+.card .sec-label:first-child{margin-top:0;}
+
+/* ---------- 首页 ---------- */
+.intro-text{font-size:14.5px;line-height:2.1;color:#333;}
+.intro-text b{border-bottom:2px solid var(--ink);}
+.chips{display:flex;flex-wrap:wrap;gap:8px 10px;margin-top:14px;}
+.chip{display:inline-flex;align-items:center;justify-content:center;flex:none;height:26px;padding:0 11px;border:1.2px solid var(--faint);border-radius:999px;font-size:12px;letter-spacing:1px;color:#777;background:#fff;}
+.main-btn{margin-top:28px;width:100%;height:56px;border-radius:28px;background:var(--ink);color:#fff;font-size:17px;font-weight:700;letter-spacing:8px;text-indent:8px;box-shadow:0 6px 18px rgba(0,0,0,.18);transition:opacity .15s,transform .1s;}
+.main-btn:active{opacity:.85;transform:scale(.99);}
+.foot-note{text-align:center;font-size:11px;color:var(--faint);letter-spacing:2px;margin-top:18px;}
+
+/* ---------- 答题 ---------- */
+.qhead{position:sticky;top:0;z-index:3;background:var(--page);display:flex;align-items:center;gap:14px;padding:18px 20px 10px;}
+.icon-btn{width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex:none;margin-left:-8px;}
+.icon-btn svg{width:22px;height:22px;color:var(--ink);}
+.qprogress{flex:1;height:3px;background:var(--line);border-radius:2px;overflow:hidden;}
+#qbar{height:100%;width:0;background:var(--ink);transition:width .3s ease;}
+#qcount{font-size:11px;color:var(--gray);letter-spacing:1px;flex:none;}
+.qtext{font-size:17px;line-height:2.05;color:#111;margin:2px 2px 18px;}
+.opts{display:flex;flex-direction:column;gap:12px;}
+.opt{background:var(--card);border:1.5px solid transparent;border-radius:20px;padding:15px 17px;font-size:14.5px;line-height:1.85;color:#333;text-align:left;box-shadow:0 2px 12px rgba(0,0,0,.05);transition:border-color .12s,opacity .12s,transform .08s;}
+.opt:active{transform:scale(.99);}
+.opt.sel{border-color:var(--ink);}
+.opt .key{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1.2px solid var(--faint);border-radius:999px;font-size:11px;color:var(--gray);margin-right:9px;flex:none;vertical-align:2px;}
+.opt.sel .key{border-color:var(--ink);background:var(--ink);color:#fff;}
+
+/* ---------- 结果 ---------- */
+.r-line{text-align:center;font-size:17px;letter-spacing:2px;line-height:2;margin-top:16px;}
+.dimrow{margin-bottom:14px;}
+.dimrow:last-child{margin-bottom:2px;}
+.dimtop{display:flex;align-items:baseline;margin-bottom:7px;}
+.dimname{font-size:13px;font-weight:700;letter-spacing:2px;}
+.dimpole{margin-left:auto;font-size:11px;color:var(--gray);letter-spacing:1px;}
+.dimtrack{position:relative;height:5px;background:#f0f0ee;border-radius:3px;}
+.dimfill{position:absolute;left:0;top:0;height:100%;background:var(--ink);border-radius:3px;transition:width .6s ease;}
+.dimmark{position:absolute;top:50%;width:11px;height:11px;border-radius:999px;background:#fff;border:2.5px solid var(--ink);transform:translate(-50%,-50%);transition:left .6s ease;}
+.dimlegend{display:flex;justify-content:space-between;font-size:10.5px;color:var(--faint);margin-top:5px;letter-spacing:1px;}
+.rtext{font-size:14.5px;line-height:2.15;color:#333;}
+.alt{text-align:center;font-size:12px;color:var(--gray);letter-spacing:1px;margin-top:14px;}
+.alt b{color:var(--ink);border-bottom:1.5px solid var(--ink);padding-bottom:1px;}
+.m-btns{display:flex;gap:12px;margin-top:22px;}
+.mb{flex:1;height:46px;border-radius:23px;font-size:15px;letter-spacing:2px;display:flex;align-items:center;justify-content:center;transition:opacity .15s;}
+.mb:active{opacity:.8;}
+.mb.ghost{border:1.5px solid var(--ink);color:var(--ink);background:#fff;}
+.mb.solid{background:var(--ink);color:#fff;}
+
+/* ---------- toast ---------- */
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:60px;max-width:80%;background:rgba(17,17,17,.88);color:#fff;font-size:13px;letter-spacing:1px;padding:10px 20px;border-radius:999px;z-index:50;text-align:center;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== 首页 ===== -->
+  <section id="view-home" class="view active">
+    <header class="hero">
+      <h1 class="logo">你是哈白里的谁</h1>
+      <p class="logo-sub">ERHA CHARACTER QUIZ</p>
+    </header>
+    <div class="pad">
+      <button id="btn-start" class="main-btn">开 始 测 试</button>
+      <p class="foot-note">仅供娱乐 · 人设归于原著</p>
+    </div>
+  </section>
+
+  <!-- ===== 答题 ===== -->
+  <section id="view-quiz" class="view">
+    <header class="qhead">
+      <button id="btn-back" class="icon-btn" aria-label="上一题">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4.5L7.5 12l7.5 7.5"/></svg>
+      </button>
+      <div class="qprogress"><div id="qbar"></div></div>
+      <span id="qcount"></span>
+    </header>
+    <div class="pad">
+      <div class="sec-label" id="q-dim"></div>
+      <p id="q-text" class="qtext"></p>
+      <div id="q-opts" class="opts"></div>
+    </div>
+  </section>
+
+  <!-- ===== 结果 ===== -->
+  <section id="view-result" class="view">
+    <header class="hero small">
+      <p class="cap">你 的 灵 魂 是</p>
+      <h1 class="r-name" id="r-name"></h1>
+      <span class="r-chip" id="r-title"></span>
+    </header>
+    <div class="pad">
+      <p class="r-line" id="r-line"></p>
+      <div class="card">
+        <div class="sec-label">五 维 剖 析</div>
+        <div id="r-bars"></div>
+        <div class="dimlegend"><span id="lg-left"></span><span>● 为所似人物坐标</span><span id="lg-right"></span></div>
+      </div>
+      <div class="card">
+        <div class="sec-label">判 词</div>
+        <p id="r-text" class="rtext"></p>
+      </div>
+      <p class="alt" id="r-alt"></p>
+      <div class="m-btns">
+        <button id="btn-retry" class="mb ghost">再测一次</button>
+        <button id="btn-copy" class="mb solid">复制结果</button>
+      </div>
+      <p class="foot-note">仅供娱乐 · 人设归于《二哈和他的白猫师尊》</p>
+    </div>
+  </section>
+
+  <div id="toast" class="toast hidden"></div>
+</div>
+
+<script>
+/* ================= 数据 ================= */
+/* 五个维度：neg 左极 / pos 右极，得分正 = 偏右极 */
+const DIMS = [
+  {name:'情热', neg:'冷月', pos:'烈火'},   /* 情感表达：克制冷淡 ↔ 外露炽热 */
+  {name:'处世', neg:'独处', pos:'人群'},   /* 内外向：独处充电 ↔ 人群发光 */
+  {name:'章法', neg:'守序', pos:'随性'},   /* 尽责性：克己守序 ↔ 洒脱随性 */
+  {name:'心术', neg:'坦荡', pos:'深藏'},   /* 自我表露：赤诚坦荡 ↔ 深藏不露 */
+  {name:'道义', neg:'自在', pos:'担道'},   /* 责任感：逍遥自在 ↔ 舍身担道 */
+  {name:'刚柔', neg:'柔韧', pos:'锋锐'},   /* 冲突姿态：以柔克刚 ↔ 宁折不弯 */
+];
+
+/* 十二道题：每维度两题；每选项 s 为该维度得分（+2/+1/-1/-2），渲染时打乱顺序 */
+const QUESTIONS = [
+  {dim:0, text:'多年未见的老友，突然出现在你面前。你的第一反应是——', opts:[
+    {t:'一个箭步冲上去抱住 TA，眼眶当场就红了', s:2},
+    {t:'笑着捶 TA 一拳："好啊你小子，来了也不吱一声！"', s:1},
+    {t:'点点头："来了。坐，喝茶。"', s:-1},
+    {t:'面上纹丝不动，把"想你"两个字咽回肚子里', s:-2},
+  ]},
+  {dim:0, text:'好友受了天大的委屈，来找你哭诉。你会——', opts:[
+    {t:'先跟着一起骂，骂到激动处一起红眼圈', s:2},
+    {t:'递上热茶认真听完，好好安慰', s:1},
+    {t:'等 TA 哭完，条分缕析地帮 TA 复盘对策', s:-1},
+    {t:'"这点小事，也值得掉眼泪？"', s:-2},
+  ]},
+  {dim:1, text:'难得空闲的一日，你会怎么安排？', opts:[
+    {t:'张罗一场大聚会，人越多越热闹越好', s:2},
+    {t:'约上三五好友，把酒言欢', s:1},
+    {t:'独自待着：看书、饮茶、撸猫', s:-1},
+    {t:'寻个无人清净处"闭关"，谁都别来寻我', s:-2},
+  ]},
+  {dim:1, text:'你误入一场全是陌生人的宴席。片刻之后——', opts:[
+    {t:'全场都在听我高谈阔论', s:2},
+    {t:'我拉住几个投缘的，越聊越火热', s:1},
+    {t:'我坐在角落，安静看众生百态', s:-1},
+    {t:'借口更衣，翻墙走人', s:-2},
+  ]},
+  {dim:2, text:'你对待"计划"的态度是——', opts:[
+    {t:'日程精确到时辰，雷打不动', s:2},
+    {t:'有计划，也给意外留几分余地', s:1},
+    {t:'计划赶不上变化，随缘最妙', s:-1},
+    {t:'计划？想做什么，当下便是', s:-2},
+  ]},
+  {dim:2, text:'戒律规矩，于你而言是——', opts:[
+    {t:'原则如山，一步不让', s:2},
+    {t:'大节无亏，小节从权', s:1},
+    {t:'规是死的，人是活的', s:-1},
+    {t:'戒律嘛，就是拿来破的', s:-2},
+  ]},
+  {dim:3, text:'想办成一件大事，你惯常——', opts:[
+    {t:'直接摊牌，明人不做暗事', s:-2},
+    {t:'光明正大，凭本事去争', s:-1},
+    {t:'讲究策略章法，善借力打力', s:1},
+    {t:'步步为营，真正的图谋谁也不告', s:2},
+  ]},
+  {dim:3, text:'身边人对"真正的你"，了解几分？', opts:[
+    {t:'心思全写在脸上，一眼见底', s:-2},
+    {t:'相熟之人，七八分都能看懂', s:-1},
+    {t:'只让人看见我想给的那一面', s:1},
+    {t:'我的底牌，从未示人', s:2},
+  ]},
+  {dim:4, text:'目睹不平之事、弱者受欺，你会——', opts:[
+    {t:'哪怕豁出性命，也要管到底', s:2},
+    {t:'力所能及处，绝不袖手', s:1},
+    {t:'事不关己，明哲保身', s:-1},
+    {t:'天地不仁，各人有各人的命', s:-2},
+  ]},
+  {dim:4, text:'你心中"好的一生"，更接近——', opts:[
+    {t:'为守护值得的人与事，燃尽自己', s:2},
+    {t:'守好一方天地，护好身边的人', s:1},
+    {t:'逍遥自在，不受世间束缚', s:-1},
+    {t:'万事不萦于怀，来去无牵挂', s:-2},
+  ]},
+  {dim:5, text:'撞上正面冲突、对方来势汹汹时，你会——', opts:[
+    {t:'硬碰硬，寸步不让，掀桌就掀桌', s:2},
+    {t:'态度强硬，但给彼此留三分余地', s:1},
+    {t:'绕开锋芒，换个法子解决', s:-1},
+    {t:'以退为进，先示弱周旋，来日方长', s:-2},
+  ]},
+  {dim:5, text:'被生活按在地上摩擦的时候，你——', opts:[
+    {t:'爬起来接着干，输也要输得响亮', s:2},
+    {t:'缓一口气，换个姿势再来', s:1},
+    {t:'退一步，先避开这阵风头', s:-1},
+    {t:'委曲求全，忍下这口气过日子', s:-2},
+  ]},
+];
+
+/* 二十二位人物：v = [情热, 处世, 章法, 心术, 道义, 刚柔]，各维 -2..+2 */
+const CHARS = [
+  {name:'楚晚宁', title:'人间霜雪', line:'覆雪孤峰，月色藏锋。',
+   text:'你外冷内热，原则刻进骨子里。话不多，管得严，嘴上嫌弃、行动上护短，被人心疼了还要死撑"要脸不要命"。把温柔藏进规矩的缝隙里，宁可被误解也不肯解释半句。平日里是拒人千里的霜雪，可一旦认定了谁，孤峰也会倾塌成江海。',
+   v:[-2,-2,2,-2,2,1.5]},
+  {name:'墨宗师', title:'人间烈火', line:'一腔孤勇，爱憎燎原。',
+   text:'你把喜怒都写在脸上：爱起来倾尽所有，恨起来寸草不生。看似没个正形，心里却有一杆秤——因为见过最坏的结局，所以拼了命要把在乎的人从悲剧里捞出来。认定的人和事，哪怕与全天下为敌，也用命去护。烧得烈，也暖得真。',
+   v:[2,2,-1,-2,2,0.5]},
+  {name:'踏仙君', title:'人间业火', line:'帝座之上，唯我独尊。',
+   text:'你锋芒毕露，欲望写在明面上，规矩由你亲自来定。霸气与占有欲拉满，敢冒天下之大不韪，天生一副"顺我者昌"的气焰。只是这把火烧到极处，最先灼伤的，往往是你自己。',
+   v:[2,1,-2,1,-2,2]},
+  {name:'师昧', title:'温柔假面', line:'笑意拂面，心事九曲。',
+   text:'人人都夸你温润周全，点心做得香甜，笑起来人畜无害。只有你知道，那层温柔是精心调制的药——真话只说给极少数人听，底牌从来不上桌。你潜伏在最不可能起疑的地方，等一个为族人翻盘的时机。',
+   v:[0.5,1,1,2,-1,-1.5]},
+  {name:'华碧楠', title:'寒鳞圣手', line:'药石为舟，归乡为岸。',
+   text:'你冷静自持，一双圣手救人无数，却几乎不亲手染血——不是不能，是不屑。真正的图谋藏在温文背后，连并肩多年的人都未必看得清。你所有的温柔与狠辣，都指向同一个方向：回家。',
+   v:[-1,-0.5,0.5,2,-1,-0.5]},
+  {name:'薛蒙', title:'傲骨少年', line:'意气骄阳，宁折不弯。',
+   text:'你是众星捧月的凤凰儿，骄傲、直率、眼里揉不得半粒沙。嘴上从不饶人，可门派的规矩你比谁都守得认真——高傲从不等于无脑，你的教养刻在骨头里。被人小看的那一刻，你眼里的火比谁都亮。',
+   v:[2,1,1,-2,1,2]},
+  {name:'姜曦', title:'月下孤鹤', line:'清辉自持，不假辞色。',
+   text:'你孤傲寡言，把社交当消耗品。能力出众却懒得多言，毒舌是标配，客气是限量。世事纷扰本与你无关——除非，碍了你的清净。懂你的人自然懂，不懂的，懒得多看一眼。',
+   v:[-2,-2,1,-2,-1,1]},
+  {name:'梅含雪', title:'踏雪闲仙', line:'荒唐是表，惊鸿是里。',
+   text:'你是闭关十余年、刚刚出关的"大师兄"，什么荒唐事都做过——桃花债满天飞，情侣玉佩论对买。江湖只当你是个笑话，却没人敢接你亮剑的那一招。散漫是你的常态，深藏不露才是你的本色。',
+   v:[1,1.5,-2,-1,-1,0.5]},
+  {name:'梅寒雪', title:'朔风冷剑', line:'朔风出鞘，冷面热肠。',
+   text:'你寡言、干脆、不拖泥带水，一柄朔风在手，冷得像一场不化的雪。旁人只当你无情无趣，可该出剑时你从不迟到，该护的人你一个不落。你的温柔从不出口——只在出手的时候。',
+   v:[-2,-1,-1,-1,1,2]},
+  {name:'叶忘昔', title:'忠勇女将', line:'铁甲藏钗，一诺千金。',
+   text:'你外柔内刚、一诺千金：为救一个人可以散尽千金，为护一个门可以隐姓埋名。秘密咽进肚子里也不肯松半句口，女儿身藏在铠甲里，担当扛在肩膀上。别人只见你的意气风发，看不见你咬牙硬撑的深夜。',
+   v:[1,1,2,-1,2,1.5]},
+  {name:'宋秋桐', title:'人间清醒', line:'凤椅一梦，冷暖自知。',
+   text:'你生于被明码标价的命运，却从不认命：被标价时蛰伏，被搭救时隐忍，被逼到墙角时——先活下去再说。你的每一步都朝着"更好的日子"走，情义与是非都排在其后。骂你凉薄的人很多，可乱世里，你只想赢。',
+   v:[1,2,-1,2,-2,-1]},
+  {name:'南宫驷', title:'鲜衣怒马', line:'锋芒当鞘，热血难凉。',
+   text:'你倔、冲动、不服管教，顶着最臭的脾气，揣着最软的心肠。天塌下来先跟人对着干——因为没人能让你低头。你不知道的是：那些替你挡下的风雨，都来自你从没看懂过的目光。',
+   v:[2,0.5,-2,-2,1,2]},
+  {name:'徐霜林', title:'懒骨藏锋', line:'光脚嗑瓜子，局中执棋人。',
+   text:'你看起来吊儿郎当，光脚嗑瓜子，万事不上心——这正是你最深的伪装。散漫的皮囊底下藏着一盘大棋：真正的图谋，连朝夕相处的人都未必看得穿。"人不为己，天诛地灭"，是你的真心话。',
+   v:[0.5,-0.5,-2,2,-2,0.5]},
+  {name:'怀罪', title:'红尘渡者', line:'一盏青灯，渡人渡己。',
+   text:'你温和悲悯，见过最深的黑暗，仍选择向善。无悲寺的青灯下，你稳稳接住每一个溺水的人；为了渡一人还魂，你可以散尽一身修为，眉目如常。你的平静不是天生的——那是熬过千帆之后，自己修来的慈悲。',
+   v:[0,-1,1,-2,2,-1.5]},
+  {name:'段衣寒', title:'柔骨铮铮', line:'琵琶弦上，韧骨柔情。',
+   text:'你外柔内刚：一曲琵琶惊艳临江，一身傲骨撑过风霜。被辜负、被放逐，也不肯让仇恨过夜——临别嘱托只有一句"报恩，别寻仇"。柔的是骨上肉，铮铮的，才是骨头本身。',
+   v:[2,-0.5,0.5,-2,2,-0.5]},
+  {name:'木烟离', title:'弈局仙姝', line:'公义在口，棋局在心。',
+   text:'你是执掌天音阁的铁面阁主，断案凭证据、行事凭公道——这是天下人看见的你。没有人知道，你每一道审判都下在同一盘棋里：那些冠冕堂皇的公义，只是通向终点的一步闲子。你布的局，连至亲都蒙在鼓里。',
+   v:[-2,-1,1.5,2,-1,2]},
+  {name:'王初晴', title:'雪霁初晴', line:'旧事入药，雪霁天青。',
+   text:'你是把日子过得最柔的主母：调药理膳、和声细语，一门内外都被你照顾得妥帖。可没人知道，你也曾是山门里执剑的少女，也有一段没说出口的心事。往事压了半生，你终究亲手把它摊开——温柔底下，藏着敢从头再来的勇气。',
+   v:[1,-1,0.5,-1,1,-2]},
+  {name:'薛正雍', title:'护短尊主', line:'护短护到底，愧疚藏心底。',
+   text:'你爽朗豪迈，嗓门比气派还大：弟子受罚你敢跟全门怄气，恨不得改条门规"法不及长老"。对兄弟留下的独苗，你心头永远压着一份愧疚——嘴上不说，暗地里把最好的都留给他。你护短护到底，也把一门内外扛在肩上。',
+   v:[2,2,0.5,-1,1.5,2]},
+  {name:'容九', title:'媚骨浮生', line:'媚态是生计，算盘是心肠。',
+   text:'你眉眼含春，八面玲珑，人人只当你是一株攀附而生的菟丝花。可你的每一分媚态都明码标价：人前是柔软的笑，人后是清醒的账——与谁结盟、图谁的钱财、算谁的修为，笔笔有数。乱世里活得最久的，恰恰是你这样的人。',
+   v:[0.5,2,-2,2,-2,-2]},
+  {name:'南宫柳', title:'明哲掌门', line:'掌门之位，步步自保。',
+   text:'你端方持重，把门派声誉看得比命重。你不是不知道亏欠——只是每当"门派"与"人心"摆上秤，你总会悄悄把砝码挪向前者：弃车保帅是常技，连亲儿子也能成为破局的筹码。你活得清醒又疲惫，只是这份清醒，寒了太多人心。',
+   v:[0,1,1,1.5,-2,-2]},
+  {name:'李无心', title:'笑面庄主', line:'有理走遍天下，笑脸摆在人前。',
+   text:'你和气生财、笑口常开，遇事从不红脸："老夫最讲理。"你的理是翻旧账、请名门、走正道——一步一步把对方逼进规矩里。笑是外交，理是武器；不到万不得已，你绝不掀桌。',
+   v:[0,1.5,1,-1,1.5,-1]},
+  {name:'罗枫华', title:'篡位枭雄', line:'权柄夺来，至死不放。',
+   text:'你狠辣、缜密，为登顶可以踩着一切上去——师门也好，亲情也罢，都是你棋盘上的子。你赢了所有对手，却防不住背后的哗变。史书上你"安然病逝"，可那柄权杖，你到死也没能松手。',
+   v:[-1.5,-1,-1.5,2,-2,2]},
+];
+
+/* ================= 逻辑 ================= */
+const $ = id => document.getElementById(id);
+let idx = 0;                       /* 当前题号 0..9 */
+let answers = new Array(QUESTIONS.length).fill(null);  /* 记录每题所选选项的得分 */
+let orders = [];                   /* 每题打乱后的选项索引 */
+let result = null;
+
+function shuffle(n){
+  const a = [...Array(n).keys()];
+  for(let i = n - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz(){
+  idx = 0;
+  answers.fill(null);
+  orders = QUESTIONS.map(() => shuffle(4));
+  show('quiz');
+  renderQ();
+}
+
+function show(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  $('view-' + name).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function renderQ(){
+  const q = QUESTIONS[idx];
+  $('qbar').style.width = ((idx + 1) / QUESTIONS.length * 100) + '%';
+  $('qcount').textContent = (idx + 1) + ' / ' + QUESTIONS.length;
+  $('q-dim').textContent = '第 ' + cn(idx + 1) + ' 问 · ' + DIMS[q.dim].name;
+  $('q-text').textContent = q.text;
+  const box = $('q-opts');
+  box.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+  orders[idx].forEach((oi, k) => {
+    const b = document.createElement('button');
+    b.className = 'opt' + (answers[idx] === q.opts[oi].s ? ' sel' : '');
+    b.innerHTML = '<span class="key">' + letters[k] + '</span>' + q.opts[oi].t;
+    b.onclick = () => pick(oi, b);
+    box.appendChild(b);
+  });
+}
+
+function pick(oi, btn){
+  if(btn.classList.contains('sel')) return;
+  const q = QUESTIONS[idx];
+  answers[idx] = q.opts[oi].s;
+  document.querySelectorAll('#q-opts .opt').forEach(o => o.classList.remove('sel'));
+  btn.classList.add('sel');
+  setTimeout(() => {
+    if(idx < QUESTIONS.length - 1){ idx++; renderQ(); }
+    else finish();
+  }, 240);
+}
+
+$('btn-back').onclick = () => {
+  if(idx > 0){ idx--; renderQ(); }
+  else show('home');
+};
+
+function cn(n){ return ['一','二','三','四','五','六','七','八','九','十','十一','十二'][n - 1] || n; }
+
+/* 用户五维得分：每维两题求和（-4..+4），归一到 -2..+2 */
+function calcUser(){
+  const raw = new Array(DIMS.length).fill(0);
+  QUESTIONS.forEach((q, i) => { raw[q.dim] += answers[i]; });
+  return raw.map(x => x / 2);
+}
+
+/* 余弦相似度匹配：按"性格方向"而非绝对强度归类，使各结果分布均衡 */
+function cosSim(u, c){
+  let dot = 0, nu = 0, nc = 0;
+  for(let i = 0; i < DIMS.length; i++){
+    dot += u[i] * c.v[i];
+    nu += u[i] * u[i];
+    nc += c.v[i] * c.v[i];
+  }
+  if(nu === 0) return -nc;   /* 全居中作答：归给坐标最靠近原点的人物 */
+  return dot / Math.sqrt(nu * nc);
+}
+
+function finish(){
+  const u = calcUser();
+  const ranked = CHARS.map((c, i) => ({i, d: cosSim(u, c)})).sort((a, b) => b.d - a.d);
+  result = {u, best: CHARS[ranked[0].i], second: CHARS[ranked[1].i]};
+  renderResult();
+  show('result');
+}
+
+function renderResult(){
+  const {u, best, second} = result;
+  $('r-name').textContent = best.name;
+  $('r-title').textContent = best.title;
+  $('r-line').textContent = '「 ' + best.line + ' 」';
+  $('r-text').textContent = best.text;
+  $('lg-left').textContent = '◄ ' + best.title;
+  $('lg-right').textContent = best.name + ' ►';
+  $('r-alt').innerHTML = '次像：<b>' + second.name + '</b> · ' + second.title;
+
+  const box = $('r-bars');
+  box.innerHTML = '';
+  DIMS.forEach((d, i) => {
+    const row = document.createElement('div');
+    row.className = 'dimrow';
+    const pct = v => ((v + 4) / 8 * 100).toFixed(1);
+    const uv = u[i], cv = best.v[i];
+    row.innerHTML =
+      '<div class="dimtop"><span class="dimname">' + d.name +
+      '</span><span class="dimpole">' + poleWordOf(d, uv) + '</span></div>' +
+      '<div class="dimtrack"><div class="dimfill" style="width:0" data-w="' + pct(uv) + '"></div>' +
+      '<div class="dimmark" style="left:' + pct(cv) + '%"></div></div>';
+    box.appendChild(row);
+  });
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    box.querySelectorAll('.dimfill').forEach(f => f.style.width = f.dataset.w + '%');
+  }));
+}
+
+function poleWordOf(d, v){
+  if(Math.abs(v) < 0.75) return '居中';
+  const strong = Math.abs(v) >= 1.75;
+  return (strong ? '极' : '偏') + (v > 0 ? d.pos : d.neg);
+}
+
+/* 复制结果 */
+$('btn-copy').onclick = () => {
+  const {u, best} = result;
+  const dims = DIMS.map((d, i) => d.name + '·' + poleWordOf(d, u[i])).join('｜');
+  const text = '【测测你是哈白里的谁】\n我测出了：' + best.name + ' · ' + best.title +
+    '\n「' + best.line + '」\n五维：' + dims;
+  const done = () => toast('已复制，快去分享吧');
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+  } else fallbackCopy(text, done);
+};
+
+function fallbackCopy(text, done){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try{ document.execCommand('copy'); done(); }catch(e){ toast('复制失败，请手动截图'); }
+  document.body.removeChild(ta);
+}
+
+let toastTimer = null;
+function toast(msg){
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.remove('hidden');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.add('hidden'), 1800);
+}
+
+/* 绑定 */
+$('btn-start').onclick = startQuiz;
+$('btn-retry').onclick = startQuiz;
+
+</script>
+</body>
+</html>
